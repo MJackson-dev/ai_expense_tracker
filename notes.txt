@@ -1,0 +1,16 @@
+USER input
+
+    Option C — Environment variable (pro setup)
+
+    In .env:
+    USER_NAME=martin
+    Then:
+    CURRENT_USER = os.getenv("USER_NAME", "martin")
+
+    👉 This is actually the best long-term option
+
+
+    Option B — CLI input
+    CURRENT_USER = input("Who is adding this? (martin/loreto): ").lower()
+
+
