@@ -1,109 +1,230 @@
 # AI Expense Tracker
 
-AI-powered expense tracker that converts natural language inputs into structured financial data and automatically logs them into Google Sheets.
+AI-powered expense tracker with **Telegram (text + voice) interface**, natural language understanding, and automatic logging to Google Sheets.
+
+---
 
 ## 🚀 Overview
 
-This project allows users to input expenses in plain language (e.g. "uber 10"), and automatically:
+This project allows you to track expenses in the most natural way possible:
 
-- Extracts structured data using AI
-- Assigns payment based on user
-- Generates the current date
-- Sends the data to Google Sheets
-- Calculates shared expenses and balances dynamically
+* Send a **text message** or **voice note** via Telegram
+* AI extracts structured data (amount, category, description)
+* Data is automatically logged into Google Sheets
+* Expenses are split and balances calculated dynamically
+
+👉 Example input:
+
+* Text: `Almuerzo 8500`
+* Voice: “Almuerzo doce mil”
 
 ---
 
 ## ⚙️ Features
 
-- 🧠 Natural language expense parsing (OpenAI)
-- 💸 Automatic expense splitting (handled in Google Sheets)
-- 📅 Auto date generation (Python)
-- 👤 User-based payment tracking
-- ☁️ Google Sheets integration (gspread)
-- 🔁 Fully automated workflow
+* 🤖 **Telegram Bot Interface**
+
+  * Text messages
+  * Voice messages (`.ogg`, no conversion needed)
+
+* 🧠 **AI-Powered Parsing**
+
+  * Extracts:
+
+    * amount
+    * category
+    * description
+  * Handles Chilean context:
+
+    * “lucas”
+    * written numbers (“doce mil”)
+
+* 🎤 **Speech-to-Text**
+
+  * Uses OpenAI (`gpt-4o-mini-transcribe`)
+  * Works directly with Telegram voice notes
+
+* 📊 **Google Sheets Integration**
+
+  * Automatic row insertion
+  * Real-time expense tracking
+
+* 💸 **Expense Splitting**
+
+  * Handled via formulas in Google Sheets
+  * Tracks who paid and who owes
+
+* 🧱 **Clean Architecture**
+
+  * Core function: `process_expense(text)`
+  * Multiple input channels → one processing pipeline
 
 ---
 
 ## 🧱 Tech Stack
 
-- Python
-- OpenAI API (`gpt-4o-mini`)
-- Google Sheets API (`gspread`)
-- dotenv (environment variables)
+* Python
+* OpenAI API
+
+  * `gpt-4o-mini` (parsing)
+  * `gpt-4o-mini-transcribe` (speech-to-text)
+* Google Sheets API (`gspread`)
+* python-telegram-bot
+* dotenv
 
 ---
 
 ## 🛠️ How It Works
 
-1. User inputs an expense:
-"Uber 10"
-2. AI extracts:
+### 1. Input (Telegram or CLI)
+
+```text
+"Supermercado 15000"
+"Almuerzo doce mil"
+```
+
+---
+
+### 2. AI extracts structured data
+
 ```json
 {
-  "amount": 10000,
-  "category": "transport",
-  "description": "Uber"
+  "amount": 12000,
+  "category": "food",
+  "description": "almuerzo"
 }
 ```
-- amount (numeric value, currency-agnostic)
 
-3. Python:
-- Adds current date
-- Assigns who paid
-4. Google Sheets handles:
-- Expense splitting
-- Balance calculation "Who owes who"
+---
 
-▶️ How to Run
-1. Clone the repository
-```
+### 3. Python processing
+
+* Assigns user (Martin / Loreto)
+* Adds current date
+* Prepares structured row
+
+---
+
+### 4. Google Sheets
+
+Automatically:
+
+* Stores data
+* Splits expenses
+* Calculates balances (“who owes who”)
+
+---
+
+## ▶️ How to Run
+
+### 1. Clone repository
+
+```bash
 git clone https://github.com/YOUR_USERNAME/ai_expense_tracker.git
 cd ai_expense_tracker
 ```
-2. Install dependencies
-```
+
+---
+
+### 2. Install dependencies
+
+```bash
 pip install -r requirements.txt
 ```
-3. Set up environment variables
-- Create a .env file:
-```
+
+---
+
+### 3. Environment variables
+
+Create a `.env` file:
+
+```env
 OPENAI_API_KEY=your_api_key_here
+TELEGRAM_BOT_TOKEN=your_bot_token_here
 ```
-4. Add Google credentials
-Create a service account
-Download credentials.json
-Share your Google Sheet with the service account email
-5. Run the script _#Voice input in the near future#_
+
+---
+
+### 4. Google Sheets setup
+
+* Create a service account
+* Download `credentials.json`
+* Share your Google Sheet with the service account email
+
+---
+
+### 5. Run the Telegram bot
+
+```bash
+python telegram_bot.py
 ```
+
+Then in Telegram:
+
+1. Search your bot
+2. Click **Start**
+3. Send a message or voice note
+
+---
+
+### (Optional) Run CLI version
+
+```bash
 python main.py
 ```
-6. Enter expense
-```
-Enter expense: Uber 10
-```
-📊 Example Output
 
-Terminal:
+---
+
+## 📊 Example Output
+
+### Telegram
+
 ```
-User: martin
-Martin paid: 10000
-Loreto paid: 0
-✅ Expense added to Google Sheets
+✅ Added: supermercado quince mil
 ```
 
-Google Sheets:
--Automatically updates balances
--Calculates who owes who
+---
 
-🔮 Future Improvements
+### Google Sheets
 
--CLI input (python main.py "uber 10 lucas")
--Telegram / WhatsApp integration
--Voice input
--Web or mobile interface
--Better category detection
+* New row added automatically
+* Balances updated in real time
 
-🧠 Author
+---
 
--Built by Martin as part of a journey into AI + automation + real-world systems.
+## 🧭 Architecture
+
+```text
+Telegram (text / voice)
+        ↓
+transcribe_audio()   (if voice)
+        ↓
+process_expense(text)
+        ↓
+AI parsing (OpenAI)
+        ↓
+Google Sheets
+```
+
+---
+
+## 🔮 Future Improvements
+
+* Smarter confirmation messages (amount + category)
+* Multi-user support (Telegram user detection)
+* Weekly/monthly summaries
+* WhatsApp integration
+* Web/mobile interface
+* Improved categorization
+
+---
+
+## 🧠 Author
+
+Built by Martin as part of a journey into:
+
+* AI systems
+* Automation
+* Real-world product building
+
+---
