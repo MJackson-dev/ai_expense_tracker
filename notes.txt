@@ -1,3 +1,31 @@
+README GLOBAL (but current code is for Chile)
+
+
+  ⚡ Strategic Recommendation (Important)
+        🧱 Phase 1 (NOW — 1–2 days)
+
+        👉 Build CLI + Whisper (what we already planned)
+
+        Why?
+
+        Fastest way to validate voice
+        Debug transcription easily
+        No infra complexity
+        🚀 Phase 2 (NEXT — High Impact)
+
+        👉 Move to Telegram bot
+
+        This gives you:
+
+        Real-world usage
+        Mobile-first UX
+        Voice-native interaction
+        🏆 Phase 3 (ONLY if needed)
+
+        👉 WhatsApp
+
+        Only after you know you’ll use it daily
+
 USER input
 
     Option C — Environment variable (pro setup)
@@ -12,5 +40,3 @@ USER input
 
     Option B — CLI input
     CURRENT_USER = input("Who is adding this? (martin/loreto): ").lower()
-
-

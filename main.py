@@ -14,7 +14,33 @@ import json
 import gspread
 from google.oauth2.service_account import Credentials
 
+import sounddevice as sd
+from scipy.io.wavfile import write
+
 client = OpenAI()
+
+def record_audio(filename="input.wav", duration=5, fs=44100):
+    print("🎤 Recording... Speak now")
+
+    recording = sd.rec(int(duration * fs), samplerate=fs, channels=1)
+    sd.wait()
+
+    write(filename, fs, recording)
+
+    print("✅ Recording saved as", filename)
+
+def transcribe_audio(filename="input.wav"):
+    print("🧠 Transcribing audio...")
+
+    with open(filename, "rb") as audio_file:
+        transcript = client.audio.transcriptions.create(
+            model="gpt-4o-mini-transcribe",
+            file=audio_file
+        )
+
+    print("✅ Transcription complete")
+
+    return transcript.text
 
 def extract_expense(text):
     prompt = f"""
@@ -58,52 +84,58 @@ def append_to_sheet(row):
 
     sheet.append_row(row)
 
-text = input("Enter expense: ")
+def process_expense(text):
+    result = extract_expense(text)
 
-result = extract_expense(text)
-
-print("\nRAW AI OUTPUT:")
-print(result)
-
-# Convert to Python dictionary
-
-try:
-    data = json.loads(result)
-except json.JSONDecodeError:
-    print("Error parsing AI response")
+    print("\nRAW AI OUTPUT:")
     print(result)
-    exit()
 
-print("\nPARSED DATA:")
-print(data)
+    try:
+        data = json.loads(result)
+    except json.JSONDecodeError:
+        print("Error parsing AI response")
+        print(result)
+        return
 
-amount = data["amount"]
+    print("\nPARSED DATA:")
+    print(data)
 
-if CURRENT_USER == "martin":
-    paid_martin = amount
-    paid_loreto = 0
-else:
-    paid_martin = 0
-    paid_loreto = amount
+    amount = data["amount"]
 
-print("\nPAYMENT:")
-print("User:", CURRENT_USER)
-print("Martin paid:", paid_martin)
-print("Loreto paid:", paid_loreto)
+    if CURRENT_USER == "martin":
+        paid_martin = amount
+        paid_loreto = 0
+    else:
+        paid_martin = 0
+        paid_loreto = amount
 
-date = datetime.now().strftime("%Y-%m-%d")
-description = data["description"]
-category = data["category"]
+    print("\nPAYMENT:")
+    print("User:", CURRENT_USER)
+    print("Martin paid:", paid_martin)
+    print("Loreto paid:", paid_loreto)
 
-row = [
-    date,
-    description,
-    category,
-    amount,
-    paid_martin,
-    paid_loreto
-]
+    date = datetime.now().strftime("%Y-%m-%d")
+    description = data["description"]
+    category = data["category"]
 
-append_to_sheet(row)
+    row = [
+        date,
+        description,
+        category,
+        amount,
+        paid_martin,
+        paid_loreto
+    ]
 
-print("\n✅ Expense added to Google Sheets")
+    append_to_sheet(row)
+
+    print("\n✅ Expense added to Google Sheets")
+
+record_audio()
+
+text = transcribe_audio()
+
+print("\n📝 TRANSCRIBED TEXT:")
+print(text)
+
+process_expense(text)
