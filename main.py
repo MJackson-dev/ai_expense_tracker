@@ -131,11 +131,12 @@ def process_expense(text):
 
     print("\n✅ Expense added to Google Sheets")
 
-record_audio()
+if __name__ == "__main__":
+    record_audio()
 
-text = transcribe_audio()
+    text = transcribe_audio()
 
-print("\n📝 TRANSCRIBED TEXT:")
-print(text)
+    print("\n📝 TRANSCRIBED TEXT:")
+    print(text)
 
-process_expense(text)
+    process_expense(text)
